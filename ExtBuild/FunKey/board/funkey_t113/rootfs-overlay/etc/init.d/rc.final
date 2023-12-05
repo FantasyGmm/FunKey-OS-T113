@@ -1,0 +1,14 @@
+#!/bin/sh
+
+echo "------run rc.final file-----"
+
+echo "------light up RGB LED-----"
+# echo 20 > /sys/class/leds/sunxi_led0r/max_brightness
+# echo 20 > /sys/class/leds/sunxi_led0g/max_brightness
+# echo 20 > /sys/class/leds/sunxi_led1b/max_brightness
+echo cpu > /sys/class/leds/sunxi_led1g/trigger
+# echo timer > /sys/class/leds/sunxi_led0g/trigger
+# echo backlight > /sys/class/leds/sunxi_led1b/trigger
+# echo 15 > /sys/class/leds/sunxi_led1r/brightness
+# echo 10 > /sys/class/leds/sunxi_led1g/brightness
+# echo 5 > /sys/class/leds/sunxi_led1b/brightness

@@ -1,0 +1,69 @@
+From 9b76bfbbfdc489b4a50794fa491821559325b012 Mon Sep 17 00:00:00 2001
+From: Your Name <you@example.com>
+Date: Mon, 14 Aug 2023 15:00:54 +0000
+Subject: [PATCH] debug
+
+---
+ gpio_mapping.c | 4 ++--
+ mapping_list.c | 2 +-
+ parse_config.c | 2 +-
+ uinput.c       | 2 +-
+ 4 files changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/gpio_mapping.c b/gpio_mapping.c
+index fbfd4b1..94285cb 100755
+--- a/gpio_mapping.c
++++ b/gpio_mapping.c
+@@ -44,8 +44,8 @@
+ #include "parse_config.h"
+ #include "uinput.h"
+ 
+-//#define DEBUG_GPIO
+-//#define DEBUG_PERIODIC_CHECK
++#define DEBUG_GPIO
++#define DEBUG_PERIODIC_CHECK
+ #define ERROR_GPIO
+ 
+ #ifdef DEBUG_GPIO
+diff --git a/mapping_list.c b/mapping_list.c
+index a633b0b..c27d799 100644
+--- a/mapping_list.c
++++ b/mapping_list.c
+@@ -34,7 +34,7 @@
+ #include "parse_config.h"
+ #include "uinput.h"
+ 
+-//#define DEBUG_MAPPING_LIST
++#define DEBUG_MAPPING_LIST
+ #define NOTICE_MAPPING_LIST
+ #define ERROR_MAPPING_LIST
+ 
+diff --git a/parse_config.c b/parse_config.c
+index bdb3186..11dff8f 100644
+--- a/parse_config.c
++++ b/parse_config.c
+@@ -37,7 +37,7 @@
+ #include "parse_config.h"
+ #include "uinput.h"
+ 
+-//#define DEBUG_CONFIG
++#define DEBUG_CONFIG
+ #define NOTICE_CONFIG
+ #define ERROR_CONFIG
+ 
+diff --git a/uinput.c b/uinput.c
+index cf86381..4ba7b21 100755
+--- a/uinput.c
++++ b/uinput.c
+@@ -38,7 +38,7 @@
+ #include "uinput.h"
+ #include <time.h>
+ 
+-//#define DEBUG_UINPUT
++#define DEBUG_UINPUT
+ #define ERROR_UINPUT
+ 
+ #ifdef DEBUG_UINPUT
+-- 
+2.25.1
+

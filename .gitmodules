@@ -1,0 +1,3 @@
+[submodule "Buildroot-YuzukiSBC"]
+	path = Buildroot-YuzukiSBC
+	url = https://github.com/FantasyGmm/Buildroot-YuzukiSBC

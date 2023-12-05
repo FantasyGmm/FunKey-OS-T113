@@ -1,0 +1,25 @@
+From c91ed3f19ab2166dd66d22fe9bccf1ced7c42efa Mon Sep 17 00:00:00 2001
+From: Your Name <you@example.com>
+Date: Sat, 12 Aug 2023 09:33:47 +0000
+Subject: [PATCH] rename linux dtb build file
+
+---
+ arch/arm/boot/dts/Makefile | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/arch/arm/boot/dts/Makefile b/arch/arm/boot/dts/Makefile
+index 7014caa17..d6efa4b95 100644
+--- a/arch/arm/boot/dts/Makefile
++++ b/arch/arm/boot/dts/Makefile
+@@ -1136,7 +1136,7 @@ dtb-$(CONFIG_MACH_SUNIV) += \
+ dtb-$(CONFIG_ARCH_SUN8IW15P1) += \
+ 	board.dtb
+ dtb-$(CONFIG_ARCH_SUN8IW20) += \
+-	board.dtb
++	sun8i-t113-funkey-t113.dtb
+ dtb-$(CONFIG_ARCH_TANGO) += \
+ 	tango4-vantage-1172.dtb
+ dtb-$(CONFIG_ARCH_TEGRA_2x_SOC) += \
+-- 
+2.25.1
+

@@ -1,0 +1,28 @@
+From e8dbd002a81206291df364d6a1c4df814251ce4a Mon Sep 17 00:00:00 2001
+From: Your Name <you@example.com>
+Date: Tue, 8 Aug 2023 05:56:03 +0000
+Subject: [PATCH] fix gcc10 compile error
+
+---
+ Makefile | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/Makefile b/Makefile
+index a59c08a..6bc591b 100644
+--- a/Makefile
++++ b/Makefile
+@@ -383,7 +383,10 @@ KBUILD_CFLAGS   := -Wall -Wstrict-prototypes \
+ 		   -Wno-format-security \
+ 		   -fno-builtin -ffreestanding\
+ 		   -Werror\
+-		   -Wno-packed-bitfield-compat
++		   -Wno-packed-bitfield-compat\
++		   -Wno-error=attributes\
++		   -Wno-error=address-of-packed-member
++
+ KBUILD_CFLAGS	+= -fshort-wchar
+ KBUILD_AFLAGS   := -D__ASSEMBLY__
+ 
+-- 
+2.25.1
+

@@ -1,0 +1,8 @@
+[Desktop Entry]
+Name=Mega Drive
+Comment=SG/SMS/GG/MD/MCD/32X emulator
+Icon=megadrive
+Exec=/usr/games/launchers/megadrive_launch.sh %f
+Categories=emulators
+SelectorDir=/mnt/Sega Genesis
+SelectorFilter=zip,ZIP,md,MD,bin,BIN,32x,32X,cue,CUE,cso,CSO,chd,CHD,smd,SMD,gg,GG,sg,SG

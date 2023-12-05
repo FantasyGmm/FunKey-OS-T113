@@ -1,0 +1,50 @@
+From 161d7b18c2014966caaa91d0c5cb1bbc36e36bfc Mon Sep 17 00:00:00 2001
+From: Your Name <you@example.com>
+Date: Sat, 12 Aug 2023 09:19:42 +0000
+Subject: [PATCH 2/2] overclock 1.2G
+
+---
+ arch/arm/boot/dts/sun8iw20p1.dtsi | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
+
+diff --git a/arch/arm/boot/dts/sun8iw20p1.dtsi b/arch/arm/boot/dts/sun8iw20p1.dtsi
+index db4b58e73..6b6400423 100755
+--- a/arch/arm/boot/dts/sun8iw20p1.dtsi
++++ b/arch/arm/boot/dts/sun8iw20p1.dtsi
+@@ -172,7 +172,7 @@
+ 		opp@1008000000 {
+ 			opp-hz = /bits/ 64 <1008000000>;
+ 			clock-latency-ns = <244144>; /* 8 32k periods */
+-			opp-microvolt-a0 = <1000000>;
++			opp-microvolt-a0 = <950000>;
+ 			opp-microvolt-a1 = <900000>;
+ 
+ 			opp-microvolt-b0 = <950000>;
+@@ -182,8 +182,8 @@
+ 		opp@1104000000 {
+ 			opp-hz = /bits/ 64 <1104000000>;
+ 			clock-latency-ns = <244144>; /* 8 32k periods */
+-			opp-microvolt-a0 = <1050000>;
+-			opp-microvolt-a1 = <950000>;
++			opp-microvolt-a0 = <950000>;
++			opp-microvolt-a1 = <900000>;
+ 
+ 			opp-microvolt-b0 = <950000>;
+ 			opp-supported-hw = <0x3>;
+@@ -192,10 +192,10 @@
+ 		opp@1200000000 {
+ 			opp-hz = /bits/ 64 <1200000000>;
+ 			clock-latency-ns = <244144>; /* 8 32k periods */
+-			opp-microvolt-a0 = <1100000>;
+-			opp-microvolt-a1 = <1000000>;
++			opp-microvolt-a0 = <950000>;
++			opp-microvolt-a1 = <900000>;
+ 
+-			opp-supported-hw = <0x1>;
++			opp-supported-hw = <0x3>;
+ 		};
+ 	};
+ 
+-- 
+2.25.1
+

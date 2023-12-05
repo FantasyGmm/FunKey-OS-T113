@@ -1,0 +1,395 @@
+From 9b27c1bc29c9e994f1c5adf34de34cb9da7dc2fc Mon Sep 17 00:00:00 2001
+From: Your Name <you@example.com>
+Date: Sat, 12 Aug 2023 09:19:25 +0000
+Subject: [PATCH 1/2] add d300t9307v0 panel
+
+---
+ drivers/video/fbdev/sunxi/disp2/disp/Makefile |   1 +
+ .../video/fbdev/sunxi/disp2/disp/lcd/Kconfig  |   6 +
+ .../fbdev/sunxi/disp2/disp/lcd/d300t9307v0.c  | 286 ++++++++++++++++++
+ .../fbdev/sunxi/disp2/disp/lcd/d300t9307v0.h  |  22 ++
+ .../video/fbdev/sunxi/disp2/disp/lcd/panels.c |   3 +
+ .../video/fbdev/sunxi/disp2/disp/lcd/panels.h |   3 +
+ 6 files changed, 321 insertions(+)
+ create mode 100644 drivers/video/fbdev/sunxi/disp2/disp/lcd/d300t9307v0.c
+ create mode 100644 drivers/video/fbdev/sunxi/disp2/disp/lcd/d300t9307v0.h
+
+diff --git a/drivers/video/fbdev/sunxi/disp2/disp/Makefile b/drivers/video/fbdev/sunxi/disp2/disp/Makefile
+index bf624c471..b5542a21c 100644
+--- a/drivers/video/fbdev/sunxi/disp2/disp/Makefile
++++ b/drivers/video/fbdev/sunxi/disp2/disp/Makefile
+@@ -64,6 +64,7 @@ disp-$(CONFIG_LCD_SUPPORT_K101IM2QA04) += lcd/k101im2qa04.o
+ disp-$(CONFIG_LCD_SUPPORT_CC08021801_310_800X1280) += lcd/CC08021801_310_800X1280.o
+ disp-$(CONFIG_LCD_SUPPORT_K080_IM2HYL802R_800X1280) += lcd/K080_IM2HYL802R_800X1280.o
+ disp-$(CONFIG_LCD_SUPPORT_K101_IM2BYL02_L_800X1280) += lcd/K101_IM2BYL02_L_800X1280.o
++disp-$(CONFIG_LCD_SUPPORT_D300T9307V0) += lcd/d300t9307v0.o
+ disp-y += lcd/super_lcd_driver.o
+ 
+ disp-$(CONFIG_EINK_PANEL_USED) += de/disp_eink_manager.o \
+diff --git a/drivers/video/fbdev/sunxi/disp2/disp/lcd/Kconfig b/drivers/video/fbdev/sunxi/disp2/disp/lcd/Kconfig
+index 342f95dd5..db7916102 100644
+--- a/drivers/video/fbdev/sunxi/disp2/disp/lcd/Kconfig
++++ b/drivers/video/fbdev/sunxi/disp2/disp/lcd/Kconfig
+@@ -1,3 +1,9 @@
++config LCD_SUPPORT_D300T9307V0
++	bool "LCD support D300T9307V0 panel"
++	default y
++	---help---
++		If you want to support D300T9307V0 panel for display driver, select it.
++
+ config LCD_SUPPORT_GG1P4062UTSW
+ 	bool "LCD support cpu_gg1p4062utsw panel"
+ 	default n
+diff --git a/drivers/video/fbdev/sunxi/disp2/disp/lcd/d300t9307v0.c b/drivers/video/fbdev/sunxi/disp2/disp/lcd/d300t9307v0.c
+new file mode 100644
+index 000000000..e27c6cb9c
+--- /dev/null
++++ b/drivers/video/fbdev/sunxi/disp2/disp/lcd/d300t9307v0.c
+@@ -0,0 +1,286 @@
++/*
++ * drivers/video/fbdev/sunxi/disp2/disp/lcd/d300t9307v0.c
++ *
++ * Copyright (c) 2007-2018 Allwinnertech Co., Ltd.
++ * Author: zhengxiaobin <zhengxiaobin@allwinnertech.com>
++ *         zhangyuanjings <zhangyuanjings@allwinnertech.com>
++ *
++ * This software is licensed under the terms of the GNU General Public
++ * License version 2, as published by the Free Software Foundation, and
++ * may be copied, distributed, and modified under those terms.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ *
++ &lcd0 {
++	lcd_used            = <1>;
++
++	lcd_driver_name     = "d300t9307v0";
++	lcd_backlight       = <150>;
++	lcd_if              = <4>;
++
++	lcd_x           	= <480>;
++	lcd_y           	= <854>;
++	lcd_width           = <37>;
++	lcd_height          = <65>;
++    lcd_dclk_freq       = <24>;
++
++	lcd_pwm_used        = <0>;
++	lcd_pwm_ch          = <7>;
++	lcd_pwm_freq        = <50000>;
++	lcd_pwm_pol         = <0>;
++	lcd_pwm_max_limit   = <255>;
++
++	lcd_hbp             = <49>;
++	lcd_ht              = <537>;
++	lcd_hspw            = <6>;
++	lcd_vbp             = <52>;
++	lcd_vt              = <910>;
++	lcd_vspw            = <10>;
++
++
++	lcd_dsi_if          = <0>;
++	lcd_dsi_lane        = <2>;
++	lcd_dsi_te          = <0>;
++	lcd_dsi_eotp        = <0>;
++
++	lcd_frm             = <0>;
++	lcd_io_phase        = <0x0000>;
++	lcd_hv_clk_phase    = <0>;
++	lcd_hv_sync_polarity= <0>;
++	lcd_gamma_en        = <0>;
++	lcd_bright_curve_en = <0>;
++	lcd_cmap_en         = <0>;
++
++	deu_mode            = <0>;
++	lcdgamma4iep        = <22>;
++	smart_color         = <90>;
++
++	//lcd_gpio_0 =  <&pio PD 20 GPIO_ACTIVE_HIGH>;
++	lcd_gpio_0 =  <&pio PD 21 GPIO_ACTIVE_HIGH>;
++	pinctrl-0 = <&dsi2lane_pins_a>;
++	pinctrl-1 = <&dsi2lane_pins_b>;
++};
++*/
++
++#include "d300t9307v0.h"
++
++#define panel_reset(sel, val) sunxi_lcd_gpio_set_value(sel, 0, val)
++
++static void LCD_power_on(u32 sel);
++static void LCD_power_off(u32 sel);
++static void LCD_bl_open(u32 sel);
++static void LCD_bl_close(u32 sel);
++
++static void LCD_panel_init(u32 sel);
++static void LCD_panel_exit(u32 sel);
++
++static void LCD_cfg_panel_info(struct panel_extend_para *info)
++{
++	u32 i = 0, j = 0;
++	u32 items;
++	u8 lcd_gamma_tbl[][2] = {
++	    {0, 0},     {15, 15},   {30, 30},   {45, 45},   {60, 60},
++	    {75, 75},   {90, 90},   {105, 105}, {120, 120}, {135, 135},
++	    {150, 150}, {165, 165}, {180, 180}, {195, 195}, {210, 210},
++	    {225, 225}, {240, 240}, {255, 255},
++	};
++
++	u32 lcd_cmap_tbl[2][3][4] = {
++	    {
++		{LCD_CMAP_G0, LCD_CMAP_B1, LCD_CMAP_G2, LCD_CMAP_B3},
++		{LCD_CMAP_B0, LCD_CMAP_R1, LCD_CMAP_B2, LCD_CMAP_R3},
++		{LCD_CMAP_R0, LCD_CMAP_G1, LCD_CMAP_R2, LCD_CMAP_G3},
++	    },
++	    {
++		{LCD_CMAP_B3, LCD_CMAP_G2, LCD_CMAP_B1, LCD_CMAP_G0},
++		{LCD_CMAP_R3, LCD_CMAP_B2, LCD_CMAP_R1, LCD_CMAP_B0},
++		{LCD_CMAP_G3, LCD_CMAP_R2, LCD_CMAP_G1, LCD_CMAP_R0},
++	    },
++	};
++
++	items = sizeof(lcd_gamma_tbl) / 2;
++	for (i = 0; i < items - 1; i++) {
++		u32 num = lcd_gamma_tbl[i + 1][0] - lcd_gamma_tbl[i][0];
++
++		for (j = 0; j < num; j++) {
++			u32 value = 0;
++
++		value =
++			    lcd_gamma_tbl[i][1] +
++			    ((lcd_gamma_tbl[i + 1][1] - lcd_gamma_tbl[i][1]) *
++			     j) /
++				num;
++			info->lcd_gamma_tbl[lcd_gamma_tbl[i][0] + j] =
++		    (value << 16) + (value << 8) + value;
++		}
++	}
++	info->lcd_gamma_tbl[255] = (lcd_gamma_tbl[items - 1][1] << 16) +
++				   (lcd_gamma_tbl[items - 1][1] << 8) +
++				   lcd_gamma_tbl[items - 1][1];
++
++	memcpy(info->lcd_cmap_tbl, lcd_cmap_tbl, sizeof(lcd_cmap_tbl));
++}
++
++static s32 LCD_open_flow(u32 sel)
++{
++	/* open lcd power, and delay 50ms */
++	printk(KERN_INFO,"[INFO]d300t9307v0 pw on \n");
++	LCD_OPEN_FUNC(sel, LCD_power_on, 50);
++	/* open lcd power, than delay 200ms */
++	printk(KERN_INFO,"[INFO]d300t9307v0 panel init \n");
++	LCD_OPEN_FUNC(sel, LCD_panel_init, 120);
++	/* open lcd controller, and delay 100ms */
++	printk(KERN_INFO,"[INFO]d300t9307v0 tcon on \n");
++	LCD_OPEN_FUNC(sel, sunxi_lcd_tcon_enable, 120);
++	/* open lcd backlight, and delay 0ms */
++	printk(KERN_INFO,"[INFO]d300t9307v0 bl on \n");
++	LCD_OPEN_FUNC(sel, LCD_bl_open, 0);
++
++	return 0;
++}
++
++static s32 LCD_close_flow(u32 sel)
++{
++	/* close lcd backlight, and delay 0ms */
++	LCD_CLOSE_FUNC(sel, LCD_bl_close, 0);
++	/* close lcd controller, and delay 0ms */
++	LCD_CLOSE_FUNC(sel, sunxi_lcd_tcon_disable, 0);
++	/* open lcd power, than delay 200ms */
++	LCD_CLOSE_FUNC(sel, LCD_panel_exit, 200);
++	/* close lcd power, and delay 500ms */
++	LCD_CLOSE_FUNC(sel, LCD_power_off, 500);
++
++	return 0;
++}
++
++static void LCD_power_on(u32 sel)
++{
++	sunxi_lcd_pin_cfg(sel, 1);
++    sunxi_lcd_delay_ms(50);
++}
++
++static void LCD_bl_open(u32 sel)
++{
++	sunxi_lcd_pwm_enable(sel);
++}
++
++static void LCD_bl_close(u32 sel)
++{
++	sunxi_lcd_pwm_disable(sel);
++}
++
++static void LCD_power_off(u32 sel)
++{
++	sunxi_lcd_pin_cfg(sel, 0);
++	sunxi_lcd_delay_ms(1);
++	panel_reset(sel, 0);
++	sunxi_lcd_delay_ms(1);
++}
++
++#define REGFLAG_DELAY         0XFE
++#define REGFLAG_END_OF_TABLE  0xFC   /* END OF REGISTERS MARKER */
++
++struct LCM_setting_table {
++	u8 cmd;
++	u32 count;
++	u8 para_list[18];
++};
++
++static struct LCM_setting_table lcm_d300t9307v0_setting[] = {
++    {0xFF, 5,{0x77, 0x01, 0x00, 0x00, 0x13}},
++    {0xEF, 1, {0x08}},
++    {0xFF, 5, {0x77, 0x01, 0x00, 0x00, 0x10}},
++    {0xC0, 2, {0xE9, 0x03}},
++    {0xC1, 2, {0x10, 0x0C}},
++    {0xC2, 1, {0x20, 0x0A}},
++    {0xCC, 1, {0x10}},
++    {0xB0, 16, {0x00, 0x23, 0x2A, 0x0A, 0x0E, 0x03, 0x12, 0x06, 0x06, 0x2A, 0x00, 0x10, 0x0F, 0x2D, 0x34, 0x1F}},
++    {0xB1, 16, {0x00, 0x24, 0x2B, 0x0F, 0x12, 0x07, 0x15, 0x0A, 0x0A, 0x2B, 0x08, 0x13, 0x10, 0x2D, 0x33, 0x1F}},
++    {0xFF, 5, {0x77, 0x01, 0x00, 0x00, 0x11}},
++    {0xB0, 1, {0x4D}},
++    {0xB1, 1, {0x48}},
++    {0xB2, 1, {0x84}},
++    {0xB3, 1, {0x80}},
++    {0xB5, 1, {0x45}},
++    {0xB7, 1, {0x85}},
++    {0xB8, 1, {0x33}},
++    {0xC1, 1, {0x78}},
++    {0xC2, 1, {0x78}},
++    {0xD0, 1, {0x88}},
++    {0xE0, 3, {0x00, 0x00, 0x02}},
++    {0xE1, 11, {0x06, 0xA0, 0x08, 0xA0, 0x05, 0xA0, 0x07, 0xA0, 0x00, 0x44, 0x44}},
++    {0xE2, 12, {0x30, 0x30, 0x44, 0x44, 0x6E, 0xA0, 0x00, 0x00, 0x6E, 0xA0, 0x00, 0x00}},
++    {0xE3, 4, {0x00, 0x00, 0x33, 0x33}},
++    {0xE4, 2, {0x44, 0x44}},
++    {0xE5, 16, {0x0D, 0x69, 0x0A, 0xA0, 0x0F, 0x6B, 0x0A, 0xA0, 0x09, 0x65, 0x0A, 0xA0, 0x0B, 0x67, 0x0A, 0xA0}},
++    {0xE6, 4, {0x00, 0x00, 0x33, 0x33}},
++    {0xE7, 2, {0x44, 0x44}},
++    {0xE8, 16, {0x0C, 0x68, 0x0A, 0xA0, 0x0E, 0x6A, 0x0A, 0xA0, 0x08, 0x64, 0x0A, 0xA0, 0x0A, 0x66, 0x0A, 0xA0}},
++    {0xE9, 2, {0x36, 0x00}},
++    {0xEB, 7, {0x00, 0x01, 0xE4, 0xE4, 0x44, 0x88, 0x40}},
++    {0xED, 16, {0xFF, 0x45, 0x67, 0xFA, 0x01, 0x2B, 0xCF, 0xFF, 0xFF, 0xFC, 0xB2, 0x10, 0xAF, 0x76, 0x54, 0xFF}},
++    {0xEF, 6, {0x10, 0x0D, 0x04, 0x08, 0x3F, 0x1F}},
++    {0x11 ,0, {}},
++    {REGFLAG_DELAY, REGFLAG_DELAY, {120} },
++    // {0x3A, 1 , {0x55}},//RGB565
++    {0x3A, 1 , {0x70}},//RGB888 Default
++    {0x29 ,0, {}},
++    {REGFLAG_END_OF_TABLE, REGFLAG_END_OF_TABLE, {} }
++};
++
++static void LCD_panel_init(u32 sel)
++{
++	/* reset lcd by gpio */
++	panel_reset(sel, 1);
++	sunxi_lcd_delay_ms(1);
++	panel_reset(sel, 0);
++	sunxi_lcd_delay_ms(10);
++	panel_reset(sel, 1);
++	sunxi_lcd_delay_ms(150);
++
++	printk(KERN_INFO,"[INFO]d300t9307v0 panel init start\n");
++
++	sunxi_lcd_dsi_clk_enable(sel);
++	sunxi_lcd_delay_ms(10);
++	u32 i;
++	for (i = 0;; i++) {
++		if (lcm_d300t9307v0_setting[i].cmd == REGFLAG_END_OF_TABLE)
++			break;
++		else if (lcm_d300t9307v0_setting[i].cmd == REGFLAG_DELAY)
++			sunxi_lcd_delay_ms(lcm_d300t9307v0_setting[i].para_list[0]);
++		else {
++			dsi_dcs_wr(sel, lcm_d300t9307v0_setting[i].cmd,
++							lcm_d300t9307v0_setting[i].para_list,
++							lcm_d300t9307v0_setting[i].count);
++					}
++	}
++	printk(KERN_INFO,"[INFO]d300t9307v0 panel init finsih\n");
++}
++
++static void LCD_panel_exit(u32 sel)
++{
++	sunxi_lcd_dsi_dcs_write_0para(sel, 0x28);
++	sunxi_lcd_delay_ms(10);
++	sunxi_lcd_dsi_dcs_write_0para(sel, 0x10);
++	sunxi_lcd_delay_ms(10);
++}
++
++/* sel: 0:lcd0; 1:lcd1 */
++static s32 LCD_user_defined_func(u32 sel, u32 para1, u32 para2, u32 para3)
++{
++	return 0;
++}
++
++struct __lcd_panel d300t9307v0_panel = {
++	/* panel driver name, must mach the name of lcd_drv_name in sys_config.fex */
++	.name = "d300t9307v0",
++	.func = {
++		.cfg_panel_info = LCD_cfg_panel_info,
++		.cfg_open_flow = LCD_open_flow,
++		.cfg_close_flow = LCD_close_flow,
++		.lcd_user_defined_func = LCD_user_defined_func,
++	},
++};
+\ No newline at end of file
+diff --git a/drivers/video/fbdev/sunxi/disp2/disp/lcd/d300t9307v0.h b/drivers/video/fbdev/sunxi/disp2/disp/lcd/d300t9307v0.h
+new file mode 100644
+index 000000000..98e180bb1
+--- /dev/null
++++ b/drivers/video/fbdev/sunxi/disp2/disp/lcd/d300t9307v0.h
+@@ -0,0 +1,22 @@
++/* drivers/video/sunxi/disp2/disp/lcd/d300t9307v0.h
++ *
++ * Copyright (c) 2017 Allwinnertech Co., Ltd.
++ * Author: zhengxiaobin <zhengxiaobin@allwinnertech.com>
++ *         zhangyuanjings <zhangyuanjings@allwinnertech.com>
++ *
++ * d300t9307v0 panel driver
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License version 2 as
++ * published by the Free Software Foundation.
++*/
++#ifndef _D300T9307V0_H
++#define _D300T9307V0_H
++
++#include "panels.h"
++
++extern struct __lcd_panel d300t9307v0_panel;
++
++extern s32 bsp_disp_get_panel_info(u32 screen_id, struct disp_panel_para *info);
++
++#endif /*End of file*/
+\ No newline at end of file
+diff --git a/drivers/video/fbdev/sunxi/disp2/disp/lcd/panels.c b/drivers/video/fbdev/sunxi/disp2/disp/lcd/panels.c
+index c7d8b9c06..57ff73067 100644
+--- a/drivers/video/fbdev/sunxi/disp2/disp/lcd/panels.c
++++ b/drivers/video/fbdev/sunxi/disp2/disp/lcd/panels.c
+@@ -127,6 +127,9 @@ struct __lcd_panel *panel_array[] = {
+ #ifdef CONFIG_LCD_SUPPORT_K101_IM2BYL02_L_800X1280
+ 	&K101_IM2BYL02_L_800X1280_mipi_panel,
+ #endif
++#ifdef CONFIG_LCD_SUPPORT_D300T9307V0
++	&d300t9307v0_panel,
++#endif
+ 	&super_lcd_panel,
+ 	NULL,
+ };
+diff --git a/drivers/video/fbdev/sunxi/disp2/disp/lcd/panels.h b/drivers/video/fbdev/sunxi/disp2/disp/lcd/panels.h
+index 1e9e70977..c242ee665 100644
+--- a/drivers/video/fbdev/sunxi/disp2/disp/lcd/panels.h
++++ b/drivers/video/fbdev/sunxi/disp2/disp/lcd/panels.h
+@@ -167,6 +167,9 @@ extern struct __lcd_panel K101_IM2BYL02_L_800X1280_mipi_panel;
+ #ifdef CONFIG_LCD_SUPPORT_K080_IM2HYL802R_800X1280
+ extern struct __lcd_panel K080_IM2HYL802R_800X1280_mipi_panel;
+ #endif
++#ifdef CONFIG_LCD_SUPPORT_D300T9307V0
++extern struct __lcd_panel d300t9307v0_panel;
++#endif
+ 
+ extern struct __lcd_panel super_lcd_panel;
+ 
+-- 
+2.25.1
+
