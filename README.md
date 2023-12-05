@@ -2,8 +2,8 @@
 
 ## 获取源码设置环境
 ```
-git clone --depth=1 https://github.com//FantasyGmm/FunKey-T113
-cd FunKey-T113/
+git clone --depth=1 https://github.com//FantasyGmm/FunKey-OS-T113
+cd FunKey-OS-T113/
 git submodule update --init --recursive     # 初始化子模块仓库
 source envsetup.sh                          # 配置编译环境
 make fun                                    # 编译系统
