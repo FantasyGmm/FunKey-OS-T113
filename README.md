@@ -17,6 +17,6 @@ make fun_rebuild_uboot                      # 重新编译uboot
 make fun_rebuild_busybox                    # 重新编译busybox
 make fun_defconfig                          # 保存所有配置到板级文件夹
 ```
-
+### 最终生成的镜像位于: `FunKey-OS-T113/Buildroot-YuzukiSBC/FunKey/output/images/sdcard.img`
 ### 更多make可用命令,见子模块仓库的Makefile文件
 ### 修改的文件夹在子模块内部，如果需要提交仓库请复制出来覆盖到外部ExtBuild里面
