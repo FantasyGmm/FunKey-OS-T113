@@ -1,7 +1,9 @@
 # FunKey-T113
 
 ## 获取源码设置环境
+### 仅在Ub20.04上测试过
 ```
+sudo apt install zip mkbootimg -y
 git clone --depth=1 https://github.com//FantasyGmm/FunKey-OS-T113
 cd FunKey-OS-T113/
 git submodule update --init --recursive     # 初始化子模块仓库
