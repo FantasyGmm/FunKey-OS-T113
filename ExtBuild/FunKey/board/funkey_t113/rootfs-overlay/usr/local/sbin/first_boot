@@ -17,7 +17,7 @@ if [ "${root_part_num}" -eq 1 ]; then
     die_notif 0 "recovery mode"
 elif [ "${root_part_num}" = "{$root_part}" ]; then
     die_notif 1 "${root_part} is not an SD card partition, aborting"
-elif [ "${root_part_num}" -ne 2 ]; then
+elif [ "${root_part_num}" -ne 5 ]; then
     die_notif 2 "unknown partition layout, aborting"
 fi
 let swap_part_num=${root_part_num}+1
@@ -35,7 +35,7 @@ resize_rootfs_partition () {
     # Check if root partition is already resized
     local rootfs_part_line=$(fdisk -l /dev/mmcblk0 2>/dev/null | grep ${root_part})
     set ${rootfs_part_line}
-    local rootfs_part_size=${6}
+    local rootfs_part_size=${5}
     if [ "${rootfs_part_size}" = "1G" ]; then
 	info "root partition is already resized"
 	return 0
@@ -45,7 +45,7 @@ resize_rootfs_partition () {
     local last_part_line=$(fdisk -l /dev/mmcblk0 2>/dev/null | tail -n 1)
     set ${last_part_line}
     local last_part_num=${1#/dev/mmcblk0p}
-    local part_start=${3}
+    local part_start=${2}
     if [ "${last_part_num}" != "${root_part_num}" ]; then
 	die_notif 4 "rootfs is not the last partition. Don't know how to expand, aborting"
     fi
@@ -56,18 +56,12 @@ resize_rootfs_partition () {
 d
 ${root_part_num}
 n
-p
 ${root_part_num}
 ${part_start}
 +1G
+N
 w
 EOF
-
-    # Mark the rootfs partition as bootable
-    sfdisk -A /dev/mmcblk0 ${root_part_num} >/dev/null 2>&1 || die_notif 7 "cannot make the rootfs partition bootable, aborting"
-
-    # Reload the partition table
-    partprobe /dev/mmcblk0 >/dev/null 2>&1 || die_notif 8 "cannot reload the partition table, aborting"
 
     return 0
 }
@@ -109,13 +103,12 @@ create_swap () {
 	    swap_part=/dev/mmcblk0p${swap_part_num}
 	    fdisk /dev/mmcblk0 >/dev/null 2>&1 <<EOF
 n
-p
 ${swap_part_num}
 
 +128M
 t
 ${swap_part_num}
-82
+19
 w
 EOF
 	fi
@@ -162,20 +155,16 @@ create_usb_partition () {
 	usb_part=/dev/mmcblk0p${usb_part_num}
 	fdisk /dev/mmcblk0 >/dev/null 2>&1 <<EOF
 n
-p
 ${usb_part_num}
 
 
 t
 ${usb_part_num}
-c
+16
 w
 EOF
 	sync
     fi
-
-    # Reload the partition table
-    partprobe /dev/mmcblk0 >/dev/null 2>&1 || die_notif 14 "cannot reload the partition table, aborting"
 
     return 0
 }
@@ -201,8 +190,9 @@ copy_files_to_usb_partition () {
     if [ $? -ne 0 ]; then
 	mount /mnt/ || die_notif 16 "Cannot mount /mnt"
     fi
-
-    # Copy freware games and other necessary mnt files
+    
+    # # Copy freware games and other necessary mnt files
+    export UNZIP_DISABLE_ZIPBOMB_DETECTION=TRUE
     unzip -q -o /usr/local/share/mnt_files.zip -d /mnt/
 
     # Copy OPKs
